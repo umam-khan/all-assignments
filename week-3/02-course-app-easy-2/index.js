@@ -67,16 +67,12 @@ app.post("/admin/signup", (req, res) => {
 }
 });
 
-app.post("/admin/login", authenticateAdmin, (req, res) => {
+app.post("/admin/login", (req, res) => {
   const { username, password } = req.headers;
-  const admin = {
-    username: username,
-    password: password,
-  };
-  const adminExists = ADMINS.find(a => a.username === admin.username) //existing toh check kar while signing up
+  const adminExists = ADMINS.find(a => a.username === username && a.password === password) //existing toh check kar while signing up
   if(adminExists)
   {
-    const token =jwt.sign({isAdmin :true}, secretKey);
+    const token =jwt.sign({isAdmin :true}, secretKey , {expiresIn : '1hr'});
     res.status(403).json({ message: "Admin already exists", token });
   }else {
   res.status(400).json({ message: "invallid " });
@@ -85,16 +81,8 @@ app.post("/admin/login", authenticateAdmin, (req, res) => {
 });
 
 app.post("/admin/courses",authenticateAdmin, (req, res) => {
-  const { title, description, price, imageLink, published } = req.body;
-  const course = {
-    courseId: Math.floor(Math.random() * 100),
-    title: title,
-    description: description,
-    price: price,
-    imageLink: imageLink,
-    published: published,
-  };
-  COURSES.push(course);
+  const course = req.body;
+  COURSES.push({...course, courseId: Math.floor(Math.random() * 100)});
   res.json({
     message: "Course created successfully",
     courseId: course.courseId,
@@ -104,15 +92,18 @@ app.post("/admin/courses",authenticateAdmin, (req, res) => {
 
 app.put("/admin/courses/:courseId", authenticateAdmin,(req, res) => {
   const { courseId } = req.params;
-  const courseIndex = COURSES.findIndex(
+  
+  const course = COURSES.find(
     (course) => course.courseId === +courseId
   );
-  if (courseIndex === -1) {
+  
+  if (!course) {
     res.status(400).json({ message: "Course not found" });
   } else {
-    const oldCourse = COURSES[courseIndex];
-    const updatedCourse = { ...oldCourse, ...req.body, courseId: +courseId };
-    COURSES.splice(courseIndex, 1, updatedCourse);
+    Object.assign(course, req.body)
+    // const oldCourse = COURSES[courseIndex];
+    // const updatedCourse = { ...oldCourse, ...req.body, courseId: +courseId };
+    // COURSES.splice(courseIndex, 1, updatedCourse);
     res.status(200).json({ message: "Course updated successfully" });
   }
   // logic to edit a course

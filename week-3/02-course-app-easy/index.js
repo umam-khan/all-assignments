@@ -23,10 +23,11 @@ const authenticateAdmin = (req,res,next) =>{
 };
 const authenticateUser = (req, res, next) => {
   const { username, password } = req.headers;
-  const userExists = USERS.some(
+  const user = USERS.find(
     (user) => user.username === username && user.password === password
   );
-  if (userExists) {
+  if (user) {
+    req.user = user ; // reference pass hogayii
     req.isUser = true;
     req.username = username
     req.password = password
@@ -78,15 +79,11 @@ app.post("/admin/courses",authenticateAdmin, (req, res) => {
 
 app.put("/admin/courses/:courseId", authenticateAdmin,(req, res) => {
   const { courseId } = req.params;
-  const courseIndex = COURSES.findIndex(
-    (course) => course.courseId === +courseId
-  );
-  if (courseIndex === -1) {
+  const course = COURSES.find((course) => course.courseId === +courseId);
+  if (!course) {
     res.status(400).json({ message: "Course not found" });
   } else {
-    const oldCourse = COURSES[courseIndex];
-    const updatedCourse = { ...oldCourse, ...req.body, courseId: +courseId };
-    COURSES.splice(courseIndex, 1, updatedCourse);
+    Object.assign(course, req.body)
     res.status(200).json({ message: "Course updated successfully" });
   }
   // logic to edit a course
@@ -104,12 +101,7 @@ app.get("/admin/courses", authenticateAdmin, (req, res) => {
 
 // User routes
 app.post("/users/signup", (req, res) => {
-  const { username, password } = req.body;
-  const user = {
-    username: username,
-    password: password,
-    purchasedCourses : []
-  };
+  const user = {...req.body, purchasedCourses : []} 
   USERS.push(user);
   res.status(200).json({ message: "User created successfully" });
 });
@@ -133,13 +125,13 @@ app.get("/users/courses",authenticateUser, (req, res) => {
 });
 
 app.post("/users/courses/:courseId", authenticateUser,(req, res) => {
-  const userIndex = USERS.findIndex((user) => user.username === req.username && user.password === req.password)
+  const user = USERS.find((user) => user.username === req.username && user.password === req.password)
   const courseId = +req.params.courseId;
-  const courseIndex = COURSES.findIndex((course) => course.courseId === courseId);
+  const course = COURSES.find((course) => course.courseId === courseId);
   if(req.isUser)
   {
-    USERS[userIndex].purchasedCourses.push(COURSES[courseIndex]);
-    console.log(USERS[userIndex].purchasedCourses);
+    user.purchasedCourses.push(course);
+    console.log(user.purchasedCourses);
     res.status(200).json({ message: 'Course purchased successfully'})
   }
   else{
