@@ -25,7 +25,7 @@ const Todos = () => {
   return (
     <>
         <div className="TodoWrapper">
-        <h1>Todo App</h1>
+        <h1>Notes App</h1>
           <TodoForm setTodos={setTodos} todos={todos} />
           <br />
           {todos.map((todo) => {
