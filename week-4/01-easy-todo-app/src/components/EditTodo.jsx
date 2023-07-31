@@ -30,7 +30,7 @@ const EditTodo = (props) => {
   };
 
   const edit = (id, title, description) => {
-    fetch(`http://localhost:3000/todos/${id}`, {
+    fetch(`https://todoapi-uvqs.onrender.com/todos/${id}`, {
       method: 'PUT',
       body: JSON.stringify({
         title: title,

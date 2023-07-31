@@ -6,7 +6,7 @@ const TodoForm = (props) => {
   const [description, setDescription] = useState('');
 
   const addTodo = () => {
-    fetch('http://localhost:3000/todos', {
+    fetch('https://todoapi-uvqs.onrender.com/todos', {
       method: 'POST',
       body: JSON.stringify({
         title: title,

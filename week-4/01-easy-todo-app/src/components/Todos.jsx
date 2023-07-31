@@ -10,7 +10,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 const Todos = () => {
   const [todos, setTodos] = useState([]);
   useEffect(() => {
-    fetch("http://localhost:3000/todos", {
+    fetch("https://todoapi-uvqs.onrender.com/todos", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ function Todo(props) {
   );
 }
 function editTodo(id) {
-  fetch("http://localhost:3000/todos", {
+  fetch("https://todoapi-uvqs.onrender.com/todos", {
     method: "PUT",
     body: JSON.stringify({
       title: title,
@@ -82,7 +82,7 @@ function editTodo(id) {
   });
 }
 function deleteTodo(id, setTodos) {
-  fetch("http://localhost:3000/todos/" + id, {
+  fetch("https://todoapi-uvqs.onrender.com/todos/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
