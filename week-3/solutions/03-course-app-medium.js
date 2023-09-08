@@ -2,7 +2,9 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const app = express();
+const cors= require("cors");
 
+app.use(cors());
 app.use(express.json());
 
 let ADMINS = [];
@@ -66,6 +68,10 @@ app.post('/admin/login', (req, res) => {
   }
 });
 
+app.get("/admin/me",authenticateJwt, (req,res) => {
+  const username = req.user.username;
+  res.json({username : username})
+})
 app.post('/admin/courses', authenticateJwt, (req, res) => {
   const course = req.body;
   course.id = COURSES.length + 1;
